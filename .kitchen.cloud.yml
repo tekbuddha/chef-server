@@ -1,0 +1,31 @@
+---
+driver:
+  name: ec2
+  aws_access_key_id: <%= ENV['AWS_ACCESS_KEY_ID'] %>
+  aws_secret_access_key: <%= ENV['AWS_SECRET_ACCESS_KEY'] %>
+  aws_ssh_key_id: <%= ENV['AWS_KEYPAIR_NAME'] %>
+  ssh_key: <%= ENV['AWS_KEY_PATH'] %>
+
+provisioner:
+  name: chef_zero
+
+platforms:
+  - name: ubuntu-12.04
+  - name: ubuntu-14.04
+  - name: centos-6.6
+    driver:
+      image_id: ami-69ee1102
+      availability_zone: us-east-1d
+      flavor_id: m1.small
+      security_group_ids: ['sg-5327bf3e'] # chef-node1
+
+suites:
+  - name: default
+    run_list:
+      - recipe[chef-server::default]
+    attributes:
+
+  - name: full
+    run_list:
+      - recipe[chef-server::server]
+      - recipe[chef-se

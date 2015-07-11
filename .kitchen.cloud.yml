@@ -1,23 +1,43 @@
+#<% require 'kitchen-sync' %>
 ---
-driver:
-  name: ec2
-  aws_access_key_id: <%= ENV['AWS_ACCESS_KEY_ID'] %>
-  aws_secret_access_key: <%= ENV['AWS_SECRET_ACCESS_KEY'] %>
-  aws_ssh_key_id: <%= ENV['AWS_KEYPAIR_NAME'] %>
-  ssh_key: <%= ENV['AWS_KEY_PATH'] %>
+driver_config:
+  digitalocean_api_key: <%= ENV['DIGITALOCEAN_API_TOKEN'] %>
 
 provisioner:
   name: chef_zero
+  require_chef_omnibus: latest
 
 platforms:
-  - name: ubuntu-12.04
-  - name: ubuntu-14.04
-  - name: centos-6.6
-    driver:
-      image_id: ami-69ee1102
-      availability_zone: us-east-1d
-      flavor_id: m1.small
-      security_group_ids: ['sg-5327bf3e'] # chef-node1
+- name: ubuntu-12.04
+  driver_plugin: digitalocean
+  driver_config:
+    size: 2gb
+    image: ubuntu-12-04-x64
+    region: <%= ENV['DIGITALOCEAN_REGION'] %>
+    ssh_key_ids: <%= ENV['DIGITALOCEAN_SSH_KEYS'] %>
+    ssh_key: <%= ENV['DIGITALOCEAN_SSH_KEY_PATH'] %>
+  run_list:
+  - recipe[apt]
+
+- name: ubuntu-14.04
+  driver_plugin: digitalocean
+  driver_config:
+    size: 2gb
+    image: ubuntu-14-04-x64
+    region: <%= ENV['DIGITALOCEAN_REGION'] %>
+    ssh_key_ids: <%= ENV['DIGITALOCEAN_SSH_KEYS'] %>
+    ssh_key: <%= ENV['DIGITALOCEAN_SSH_KEY_PATH'] %>
+  run_list:
+  - recipe[apt]
+
+- name: centos-6.5
+  driver_plugin: digitalocean
+  driver_config:
+    size: 2gb
+    image: centos-6-5-x64
+    region: <%= ENV['DIGITALOCEAN_REGION'] %>
+    ssh_key_ids: <%= ENV['DIGITALOCEAN_SSH_KEYS'] %>
+    ssh_key: <%= ENV['DIGITALOCEAN_SSH_KEY_PATH'] %>
 
 suites:
   - name: default
@@ -28,4 +48,4 @@ suites:
   - name: full
     run_list:
       - recipe[chef-server::server]
-      - recipe[chef-se
+      - recipe[chef-server::manage]
